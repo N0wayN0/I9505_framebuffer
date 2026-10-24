@@ -1,0 +1,2 @@
+naprawic cleanup_overlay bo robi kernel panic
+touch_add_area() musi przyjmowac element i konvertowac do struct area

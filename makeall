@@ -1,0 +1,19 @@
+
+BASE=/data/tcc
+export PATH=$PATH:$BASE
+
+tcc -Wall *.c \
+-I/$BASE/include -L$BASE/lib -static -lm -lcrypt -lrt -lpthread -o test $BASE/lib/fix.o 2>&1 | \
+grep -v FIXME #| grep --color=auto -e ".[^ ]*\.[ch]:[0-9]*"
+
+exit
+tcc main.c \
+fb_only.c \
+fonts_only.c \
+shapes.c \
+overlay.c \
+input_events.c \
+layout.c \
+bitmap.c \
+-I/$BASE/include -L$BASE/lib -static -lm -lcrypt -lrt -lpthread -o test $BASE/lib/fix.o 2>&1 | \
+grep -v FIXME | grep --color=auto -e ".[^ ]*\.[ch]:[0-9]*"

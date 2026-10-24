@@ -1,0 +1,223 @@
+#include "input_events.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <stdint.h>
+#include <linux/msm_mdp.h>
+#include <linux/input.h>
+#include <poll.h>
+#include <sys/wait.h>
+
+#define VOLUME_HOME "/dev/input/event18"
+#define TOUCH_BUTTONS "/dev/input/event19"
+#define POWER_BUTTON "/dev/input/event0"
+#define TOUCHSCREEN "/dev/input/event3"
+
+#define KEY_VOLDOWN	(114)
+#define KEY_VOLUP 	(115)
+#define KEY_HOME	(172)
+#define KEY_POWER	(116)
+#define KEY_BACK	(158)
+#define KEY_MENU	(139)
+
+// input events
+int fd_power_home, fd_tbtn, fd_power, fd_tscreen;
+struct pollfd fds[4];
+extern ret;
+int touch_x = -1, touch_y = -1;
+int touch_active = 0;
+int areas_count = 0;
+struct touch_area areas[MAX_TOUCH_AREAS];
+int left_menu = 0;
+int right_menu = 0;
+
+
+int input_init() {
+    // 1. Open all input devices
+    fd_power_home = open(VOLUME_HOME, O_RDONLY | O_NONBLOCK);
+    fd_tbtn = open(TOUCH_BUTTONS, O_RDONLY | O_NONBLOCK);
+    fd_power = open(POWER_BUTTON, O_RDONLY | O_NONBLOCK);
+    fd_tscreen = open(TOUCHSCREEN, O_RDONLY | O_NONBLOCK);
+
+    if (fd_power_home < 0 || fd_tbtn < 0 || fd_power < 0 || fd_tscreen < 0) {
+        printf("Failed to open one of the input devices");
+        return -1;
+    }
+
+    // 2. Set up the pollfd array
+    fds[0].fd = fd_power_home;
+    fds[0].events = POLLIN;
+    fds[1].fd = fd_tbtn;
+    fds[1].events = POLLIN;
+    fds[2].fd = fd_power;
+    fds[2].events = POLLIN;
+    fds[3].fd = fd_tscreen;
+    fds[3].events = POLLIN;
+    printf("(%s) input devices opened succesfully\n", __func__);
+}
+
+int input_poll(struct touch_area *out) {
+        ret = poll(fds, 4, -1); // -1 means wait indefinitely
+        if (ret < 0) {
+            perror("poll failed");
+            return -1;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (fds[i].revents & POLLIN) {
+                struct input_event ev;
+                ssize_t n = read(fds[i].fd, &ev, sizeof(ev));
+                if (n == sizeof(ev)) {
+                    // Process key event
+                  //  printf("Event from fd %d: type=%d, code=%d, value=%d\n", 
+                  //         fds[i].fd, ev.type, ev.code, ev.value);
+                    
+                    // Example: Handle volume keys (assuming they are EV_KEY events)
+                    if (ev.type == EV_KEY) {
+                        if (ev.code == KEY_VOLUP) {
+                            printf("Volume Up %s\n", ev.value ? "Pressed" : "Released");
+                            if (ev.value == 1) {
+                                printf("vol up key\n");
+                            } else {
+                                printf("vol up key\n");
+                            }
+                        } else if (ev.code == KEY_VOLDOWN) {
+                            printf("Volume Down %s\n", ev.value ? "Pressed" : "Released");
+                            if (ev.value == 1) {
+                                printf("vol dn key\n");
+                            } else {
+                                printf("vol dn key\n");
+                            }
+                        } else if (ev.code == KEY_POWER) {
+                            printf("Power Key %s\n", ev.value ? "Pressed" : "Released");
+                            if (ev.value == 1) {
+                                printf("power dn key\n");
+                            } else {
+                                printf("power dn key\n");
+                            }
+                        } else if (ev.code == KEY_MENU) {
+                            printf("Menu Key %s\n", ev.value ? "Pressed" : "Released");
+                            if (ev.value == 1) {
+                                printf("menu key\n");
+                            }
+                        } else if (ev.code == KEY_BACK) {
+                            printf("Back key %s\n", ev.value ? "pressed" : "released");
+                            if (ev.value == 1) {
+                                printf("back key\n");
+                            } else {
+                                printf("back key\n");
+                            }
+                        } else if (ev.code == 172 ) { //KEY_HOME) {
+                            printf("Home key %s\n", ev.value ? "pressed" : "released");
+                            if (ev.value == 1) {
+                                printf("back key\n");
+                            } 
+                        }
+                    } 
+         
+                    // Process touch event
+                    if (ev.type == EV_ABS) {
+                        if (ev.code == ABS_X || ev.code == ABS_MT_POSITION_X) {
+                            touch_x = ev.value;
+                        } else if (ev.code == ABS_Y || ev.code == ABS_MT_POSITION_Y) {
+                            touch_y = ev.value;
+                        }
+                    } else if (ev.type == EV_KEY && ev.code == BTN_TOUCH) {
+                        touch_active = ev.value; // 1 = pressed, 0 = released
+                    } else if (ev.type == EV_SYN) {
+                        // A complete touch event packet is ready
+                        //printf("x=%d  Y=%d\n", touch_x,touch_y); 
+                        for (int i = 0; i < areas_count; i++) {
+                            struct touch_area *a = &areas[i];
+                            if (!a->enabled) continue;
+
+                            if (touch_x >= a->x && touch_x < a->x + a->w && 
+                                touch_y >= a->y && touch_y < a->y + a->h) {
+                                if (out) *out = *a;
+                                    return 1;
+                                }
+                        }
+
+                        if (touch_active && touch_x >= 0 && touch_y >= 0) {
+                            // Ignore spurious 0,0 touches [citation:9]
+                            if (touch_x != 0 || touch_y != 0) {
+                                //printf("Touch detected at X=%d, Y=%d\n", touch_x, touch_y);
+                                // Here you could add logic for tap, swipe, etc.
+                                //
+                            }
+                        }
+                        // Reset coordinates for next packet
+                        touch_x = -1;
+                        touch_y = -1;
+                    }
+
+                } // sizeof(ev)
+            }
+        }
+}
+
+
+void input_close(void)
+{
+    if (fd_power_home >= 0) { close(fd_power_home); }
+    if (fd_tbtn >= 0) { close(fd_tbtn); }
+    if (fd_power >= 0) { close(fd_power); }
+    if (fd_tscreen >= 0) { close(fd_tscreen); }
+}
+
+int touch_add_area(const struct touch_area *area)
+{
+    if (!area) return -1;
+
+    // Look for existing area with same id
+    for (int i = 0; i < areas_count; i++) {
+        if (areas[i].id == area->id) {
+            areas[i] = *area;    // replace
+            return 1;
+        }
+    }
+
+    // No match append
+    if (areas_count >= MAX_TOUCH_AREAS)
+        return -1;             // table full
+
+    areas[areas_count++] = *area;
+    printf("(%s) areas_count: %d\n", __func__, areas_count);
+    return 0;
+}
+
+void touch_clear_areas(void)
+{
+    areas_count = 0;
+    printf("(%s) areas_count: %d\n", __func__, areas_count);
+}
+
+int touch_update_areas(const struct touch_area *new_areas, int count)
+{
+    if (count < 0 || count > MAX_TOUCH_AREAS)
+        return -1;
+
+    for (int i = 0; i < count; i++) {
+        areas[i] = new_areas[i];
+    }
+    areas_count = count;
+    return 0;
+}
+
+int touch_remove_area(int id)
+{
+    for (int i = 0; i < areas_count; i++) {
+        if (areas[i].id != id) continue;
+
+        // Shift everything after it down by one
+        for (int j = i; j < areas_count - 1; j++) {
+            areas[j] = areas[j + 1];
+        }
+        areas_count--;
+        return 0;
+    }
+    return -1;                 // not found
+}

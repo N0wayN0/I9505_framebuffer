@@ -1,0 +1,6 @@
+#/system/bin/sh
+
+export PATH=/system/bin:/system/xbin:/data/tcc
+
+tcc -Wall *.c -I/data/tcc/include -L/data/tcc/lib -static -lm -lcrypt -lrt -lpthread -o test /data/tcc/lib/fix.o 2>&1 | grep -v FIXME #| grep --color=auto -e ".[^ ]*\.[ch]:[0-9]*"
+
