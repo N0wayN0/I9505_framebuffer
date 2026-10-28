@@ -76,26 +76,23 @@ void create_layout(const struct layout *layout) {
         const struct element *e = &layout->elements[i];
         printf("\n----------\n(%s) action:  %s \n", __func__, e->action);
         create_element(e);
-        a switch bedzie w create_element zeby pobrac coordinates do blit
-        switch (e->type) {
-//            case ELEM_BACKGROUND: create_background(e); break;
-//            case ELEM_STATIC:     create_static(e);     break;
-//            case ELEM_LABEL:      create_label(e);      break;
-//            case ELEM_TEXTVIEW:   create_textview(e);   break;
-            case ELEM_BUTTON:     create_button(e);     break;
-//            case ELEM_CHECKBOX:   create_checkbox(e);   break;
-//            case ELEM_RADIO:      create_radio(e);      break;
-//            case ELEM_SLIDER:     create_slider(e);     break;
 
-            default:
-                printf("(%s) unknown element type %d\n", __func__, e->type);
-                break;
-      }  // swtch
-    }  // for 
-//    printf("(%s) ----- BLIT -----\n", __func__);
-//    blit_now();
-}
-
+void create_element(const struct element *e) {
+struct x y w h crop
+    switch (e->type) {      
+      case ELEM_BUTTON:     source_element_from(button_map);     break;
+      case ELEM_CHECKBOX:   create_checkbox(e);   break;
+      case ELEM_RADIO:      create_radio(e);      break;
+     default:
+         printf("(%s) unknown element type %d\n", __func__, e->type);
+         break;
+        
+ if clickable
+make_touch_area()
+if e->label
+draw_text()
+if e->checked
+draw_checked()
 
 
 void create_layout(const struct layout *layout) {
