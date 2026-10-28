@@ -65,6 +65,38 @@ void refresh_layout() {
     create_layout(current_layout);
 }
 
+void create_layout(const struct layout *layout) {
+    printf("(%s) ----- pointer --> %p \n",__func__, (void*)layout);
+    touch_clear_areas();
+    int len = layout->count;
+    printf("(%s) Layout name: %s \n", __func__, layout->name);
+    printf("(%s) Elements No: %d \n", __func__, layout->count);
+    current_layout = layout;
+    for  (int i = 0; i < len; i++) {
+        const struct element *e = &layout->elements[i];
+        printf("\n----------\n(%s) action:  %s \n", __func__, e->action);
+        create_element(e);
+        a switch bedzie w create_element zeby pobrac coordinates do blit
+        switch (e->type) {
+//            case ELEM_BACKGROUND: create_background(e); break;
+//            case ELEM_STATIC:     create_static(e);     break;
+//            case ELEM_LABEL:      create_label(e);      break;
+//            case ELEM_TEXTVIEW:   create_textview(e);   break;
+            case ELEM_BUTTON:     create_button(e);     break;
+//            case ELEM_CHECKBOX:   create_checkbox(e);   break;
+//            case ELEM_RADIO:      create_radio(e);      break;
+//            case ELEM_SLIDER:     create_slider(e);     break;
+
+            default:
+                printf("(%s) unknown element type %d\n", __func__, e->type);
+                break;
+      }  // swtch
+    }  // for 
+//    printf("(%s) ----- BLIT -----\n", __func__);
+//    blit_now();
+}
+
+
 
 void create_layout(const struct layout *layout) {
     printf("(%s) ----- pointer --> %p \n",__func__, (void*)layout);
