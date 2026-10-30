@@ -76,6 +76,9 @@ void create_layout(const struct layout *layout) {
         const struct element *e = &layout->elements[i];
         printf("\n----------\n(%s) action:  %s \n", __func__, e->action);
         create_element(e);
+        elem *src = &defs[e->type]
+        src.t->x
+        src.t->y  for blit(src.x src.y e.x e.y)
 
 void create_element(const struct element *e) {
 struct x y w h crop
@@ -110,9 +113,7 @@ typedef struct {
 } defs;
     defs[W_BUTTON]   = { W_BUTTON,    0,   0, 200, 80 };
     defs[W_CHECKBOX] = { W_CHECKBOX, 200,   0,  32, 32 };
-         elem *t = &defs[e->type]
-         t->x
-         t->y
+         
 
 int widget_lookup(int type, int *sx, int *sy, int *sw, int *sh)
 {
