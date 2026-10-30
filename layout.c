@@ -94,6 +94,35 @@ draw_text()
 if e->checked
 draw_checked()
 
+typedef enum {
+    W_BUTTON,
+    W_CHECKBOX,
+    W_RADIO,
+    W_SLIDER,
+    W_LABEL,
+    W_IMAGE,
+    W_COUNT
+} widget_type_t;
+
+typedef struct {
+    int type;
+    int sx, sy, sw, sh;     /* rectangle inside ui_atlas.png */
+} defs;
+
+        // for x =; 0 <= w_count
+             defs[x]
+    defs[W_BUTTON]   = { W_BUTTON,    0,   0, 200, 80 };
+    defs[W_CHECKBOX] = { W_CHECKBOX, 200,   0,  32, 32 };
+
+int widget_lookup(int type, int *sx, int *sy, int *sw, int *sh)
+{
+    (for x = 0; x =< W_COUNT)
+    const widget_def_t *d = &defs[x];
+         if d->type == type
+         *sx = d->sx; *sy = d->sy; *sw = d->sw; *sh = d->sh;
+    return 0;
+}
+    
 
 void create_layout(const struct layout *layout) {
     printf("(%s) ----- pointer --> %p \n",__func__, (void*)layout);
