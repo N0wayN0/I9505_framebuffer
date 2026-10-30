@@ -108,11 +108,11 @@ typedef struct {
     int type;
     int sx, sy, sw, sh;     /* rectangle inside ui_atlas.png */
 } defs;
-
-        // for x =; 0 <= w_count
-             defs[x]
     defs[W_BUTTON]   = { W_BUTTON,    0,   0, 200, 80 };
     defs[W_CHECKBOX] = { W_CHECKBOX, 200,   0,  32, 32 };
+         elem *t = &defs[e->type]
+         t->x
+         t->y
 
 int widget_lookup(int type, int *sx, int *sy, int *sw, int *sh)
 {
