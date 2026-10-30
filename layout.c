@@ -122,7 +122,17 @@ int widget_lookup(int type, int *sx, int *sy, int *sw, int *sh)
          *sx = d->sx; *sy = d->sy; *sw = d->sw; *sh = d->sh;
     return 0;
 }
-    
+    lookup
+switch (e->type) {
+            case ELEM_BACKGROUND: get_elem(e-type); break;
+            case ELEM_STATIC:     create_static(e);     break;
+            case ELEM_LABEL:      create_label(e);      break;
+            case ELEM_TEXTVIEW:   create_textview(e);   break;
+            case ELEM_BUTTON:     create_button(e);     break;
+//            case ELEM_CHECKBOX:   create_checkbox(e);   break;
+//            case ELEM_RADIO:      create_radio(e);      break;
+//            case ELEM_SLIDER:     create_slider(e);     break;
+
 
 void create_layout(const struct layout *layout) {
     printf("(%s) ----- pointer --> %p \n",__func__, (void*)layout);
