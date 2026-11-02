@@ -75,27 +75,17 @@ void create_layout(const struct layout *layout) {
     for  (int i = 0; i < len; i++) {
         const struct element *e = &layout->elements[i];
         printf("\n----------\n(%s) action:  %s \n", __func__, e->action);
-        create_element(e);
-        elem *src = &defs[e->type]
-        src.t->x
-        src.t->y  for blit(src.x src.y e.x e.y)
-
-void create_element(const struct element *e) {
-struct x y w h crop
-    switch (e->type) {      
-      case ELEM_BUTTON:     source_element_from(button_map);     break;
-      case ELEM_CHECKBOX:   create_checkbox(e);   break;
-      case ELEM_RADIO:      create_radio(e);      break;
-     default:
-         printf("(%s) unknown element type %d\n", __func__, e->type);
-         break;
         
- if clickable
-make_touch_area()
-if e->label
-draw_text()
-if e->checked
-draw_checked()
+           elem *src = &defs[e->type]  get crop
+           blit(src.t->x src.t->y e)
+
+    if clickable
+    make_touch_area()
+    if e->label
+    draw_text()
+    if e->checked
+    draw_checked()
+ 
 
 typedef enum {
     W_BUTTON,
